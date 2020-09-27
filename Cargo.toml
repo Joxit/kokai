@@ -1,0 +1,7 @@
+[package]
+name = "kokai"
+version = "0.1.0"
+authors = ["Jones Magloire @Joxit"]
+edition = "2018"
+
+[dependencies]
