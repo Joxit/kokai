@@ -1,6 +1,8 @@
 use structopt::StructOpt;
+use crate::git::Git;
 
 #[derive(Debug, StructOpt)]
+#[structopt(name = "kokai", author, about)]
 pub struct Kokai {
   /// Path to the git repository
   #[structopt(default_value = ".")]
@@ -14,5 +16,12 @@ pub struct Kokai {
 }
 
 impl Kokai {
-  pub fn exec(&self) {}
+  pub fn exec(self) {
+    let tag = self.tag.unwrap();
+    if self.changelog {
+      for c in Git::new(&self.repository).get_all_commits_from(&tag) {
+        println!("{:?}", c);
+      }
+    }
+  }
 }
