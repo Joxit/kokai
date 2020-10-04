@@ -1,5 +1,7 @@
 pub use crate::git::commit::Commit;
 use git2::Repository;
+use std::collections::BTreeSet;
+
 mod commit;
 
 #[derive(Debug, Clone)]
@@ -17,7 +19,7 @@ impl Git {
     Repository::discover(&self.repository).unwrap()
   }
 
-  pub fn get_all_commits_from(&self, from: &String) -> Vec<Commit> {
+  pub fn get_all_commits_before(&self, from: &String) -> Vec<Commit> {
     let repository = self.repository();
 
     let start_commit = repository
@@ -25,17 +27,16 @@ impl Git {
       .unwrap()
       .peel_to_commit()
       .unwrap();
-    let mut result = vec![];
+    let mut result = BTreeSet::new();
     commit_walk(&start_commit, &mut result);
-    result
+    result.into_iter().collect::<Vec<Commit>>()
   }
 }
 
-fn commit_walk(commit: &git2::Commit, result: &mut Vec<Commit>) {
-  if result.contains(&Commit::from(commit.clone())) {
+fn commit_walk(commit: &git2::Commit, result: &mut BTreeSet<Commit>) {
+  if !result.insert(Commit::from(commit.clone())) {
     return;
   }
-  result.push(Commit::from(commit.clone()));
 
   for c in commit.parents() {
     commit_walk(&c, result);

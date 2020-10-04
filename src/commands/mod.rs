@@ -1,5 +1,5 @@
-use structopt::StructOpt;
 use crate::git::Git;
+use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "kokai", author, about)]
@@ -19,7 +19,7 @@ impl Kokai {
   pub fn exec(self) {
     let tag = self.tag.unwrap();
     if self.changelog {
-      for c in Git::new(&self.repository).get_all_commits_from(&tag) {
+      for c in Git::new(&self.repository).get_all_commits_before(&tag) {
         println!("{:?}", c);
       }
     }
