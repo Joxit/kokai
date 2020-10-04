@@ -10,11 +10,11 @@ impl Commit {
     Self { id, summary, time }
   }
 
-  fn id(&self) -> &String {
+  pub fn id(&self) -> &String {
     &self.id
   }
 
-  fn summary(&self) -> &String {
+  pub fn summary(&self) -> &String {
     &self.summary
   }
 }

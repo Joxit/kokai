@@ -5,7 +5,9 @@ authors = ["Jones Magloire @Joxit"]
 edition = "2018"
 
 [dependencies]
-structopt = { version = "^0.3"}
+structopt = "^0.3"
+regex = "^1.3"
+lazy_static = "^1.4"
 
 [dependencies.git2]
 version = "^0.13"
