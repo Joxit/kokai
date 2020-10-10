@@ -31,6 +31,16 @@ impl Git {
     commit_walk(&start_commit, &mut result);
     result.into_iter().collect::<Vec<Commit>>()
   }
+
+  pub fn get_all_tags(&self) -> Vec<String> {
+    let mut res = vec![];
+    // Equivalent to self.repository().references() with ref filter
+    self.repository().tag_foreach(|_, name| {
+      res.push(std::str::from_utf8(name).unwrap().chars().skip(10).collect::<String>());
+      true
+    }).unwrap();
+    res
+  }
 }
 
 fn commit_walk(commit: &git2::Commit, result: &mut BTreeSet<Commit>) {
