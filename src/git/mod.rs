@@ -1,6 +1,6 @@
 pub use crate::git::commit::Commit;
 use git2::Repository;
-use std::collections::BTreeSet;
+use std::collections::HashSet;
 
 mod commit;
 
@@ -41,13 +41,45 @@ impl Git {
       .collect()
   }
 
-  pub fn get_all_tags(&self) -> Vec<String> {
+  pub fn get_all_commits_until_tag(&self, from: &String) -> Vec<Commit> {
+    let repo = self.repository();
+    let mut walk = repo.revwalk().unwrap();
+
+    let start_commit = repo
+      .revparse_single(&from)
+      .unwrap()
+      .peel_to_commit()
+      .unwrap();
+    let all_tags = self.get_all_tags();
+    let tag_ids: HashSet<&String> = all_tags.iter().map(|(id, _)| id).collect();
+
+    walk.push(start_commit.id()).unwrap();
+    walk.set_sorting(git2::Sort::TOPOLOGICAL).unwrap();
+
+    let iter = walk
+      .into_iter()
+      .map(|c| c.unwrap())
+      .map(|c| repo.revparse_single(format!("{}", c).as_str()).unwrap());
+
+    let mut result = vec![];
+    for object in iter {
+      if let Ok(commit) = object.clone().peel_to_commit() {
+        if result.len() != 0 && tag_ids.contains(&format!("{}", commit.id())) {
+          return result;
+        }
+        result.push(Commit::from(commit));
+      }
+    }
+    result
+  }
+
+  pub fn get_all_tags(&self) -> Vec<(String, String)> {
     let mut res = vec![];
     // Equivalent to self.repository().references() with ref filter
     self
       .repository()
-      .tag_foreach(|_, name| {
-        res.push(remove_ref_tags(name));
+      .tag_foreach(|id, name| {
+        res.push((format!("{}", id), remove_ref_tags(name)));
         true
       })
       .unwrap();
@@ -61,14 +93,4 @@ fn remove_ref_tags(name: &[u8]) -> String {
     .chars()
     .skip(10)
     .collect::<String>()
-}
-
-fn commit_walk(commit: &git2::Commit, result: &mut BTreeSet<Commit>) {
-  if !result.insert(Commit::from(commit.clone())) {
-    return;
-  }
-
-  for c in commit.parents() {
-    commit_walk(&c, result);
-  }
 }
