@@ -4,7 +4,7 @@ use regex::Regex;
 
 lazy_static! {
   static ref SUMMARY_REGEX: Regex =
-    Regex::new("^(?P<type>fix|feat|perf|revert)(?:\\(?P<scope>.*\\))?: (?P<summary>.*)$").unwrap();
+    Regex::new("^(?P<type>fix|feat|perf|revert|build|chore|ci|docs|style|refactor|test)(?:\\((?P<scope>.*)\\))?: (?P<summary>.*)$").unwrap();
 }
 
 #[derive(Debug, Clone)]
@@ -16,14 +16,14 @@ pub struct AngularCommit {
 }
 
 impl std::convert::TryFrom<Commit> for AngularCommit {
-  type Error = ();
-  fn try_from(commit: Commit) -> Result<AngularCommit, ()> {
+  type Error = String;
+  fn try_from(commit: Commit) -> Result<AngularCommit, String> {
     let id = commit.id();
     if let Some(matches) = SUMMARY_REGEX.captures(commit.summary()) {
       let commit_type = matches.name("type");
       let summary = matches.name("summary");
       if commit_type.is_none() || summary.is_none() {
-        return Err(());
+        return Err(format!("Commit type is empty"));
       }
       Ok(AngularCommit {
         id: id.to_string(),
@@ -32,7 +32,9 @@ impl std::convert::TryFrom<Commit> for AngularCommit {
         commit_type: CommitType::try_from(commit_type.unwrap().as_str())?,
       })
     } else {
-      Err(())
+      Err(format!(
+        "This commit message don't use the conventionnal commit"
+      ))
     }
   }
 }
