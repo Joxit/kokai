@@ -1,5 +1,5 @@
 use crate::git::Git;
-use crate::parser::AngularCommit;
+use crate::parser::ConventionalCommit;
 use std::convert::TryFrom;
 use structopt::StructOpt;
 
@@ -22,7 +22,13 @@ impl Kokai {
     let tag = self.tag.unwrap();
     if self.changelog {
       for c in Git::new(&self.repository).get_all_commits_before(&tag) {
-        if let Ok(c) = AngularCommit::try_from(c) {
+        if let Ok(c) = ConventionalCommit::try_from(c) {
+          println!("{:?}", c);
+        }
+      }
+    } else {
+      for c in Git::new(&self.repository).get_all_commits_until_tag(&tag) {
+        if let Ok(c) = ConventionalCommit::try_from(c) {
           println!("{:?}", c);
         }
       }
