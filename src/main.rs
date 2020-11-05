@@ -4,6 +4,7 @@ use crate::commands::Kokai;
 use structopt::StructOpt;
 
 mod commands;
+mod format;
 mod git;
 mod parser;
 

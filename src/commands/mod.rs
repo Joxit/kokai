@@ -15,6 +15,9 @@ pub struct Kokai {
   /// Create a full changelog for the entire project.
   #[structopt(long = "changelog")]
   pub changelog: bool,
+  /// Create a full changelog for the entire project.
+  #[structopt(long = "test")]
+  pub test: bool,
 }
 
 impl Kokai {
@@ -23,15 +26,24 @@ impl Kokai {
     if self.changelog {
       for c in Git::new(&self.repository).get_all_commits_before(&tag) {
         if let Ok(c) = ConventionalCommit::try_from(c) {
-          println!("{:?}", c);
+          println!("{}", c);
         }
       }
     } else {
-      for c in Git::new(&self.repository).get_all_commits_until_tag(&tag) {
-        if let Ok(c) = ConventionalCommit::try_from(c) {
-          println!("{:?}", c);
-        }
-      }
+      let commits: Vec<ConventionalCommit> = Git::new(&self.repository)
+        .get_all_commits_until_tag(&tag)
+        .into_iter()
+        .map(|c| ConventionalCommit::try_from(c))
+        .filter(|c| c.is_ok())
+        .map(|c| c.unwrap())
+        .collect();
+      let mut stdout = std::io::stdout();
+      crate::format::angular::print_conventional_commit_release(
+        &mut stdout,
+        &commits,
+        crate::format::FormatOptions { show_all: true },
+      )
+      .unwrap();
     }
   }
 }
