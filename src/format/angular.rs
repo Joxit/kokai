@@ -4,6 +4,8 @@ use std::io::Write;
 
 pub fn print_conventional_commit_release<W: Write>(
   w: &mut W,
+  tag: &String,
+  date: Option<String>,
   commits: &Vec<CC>,
   opts: FormatOptions,
 ) -> std::io::Result<()> {
@@ -51,6 +53,12 @@ pub fn print_conventional_commit_release<W: Write>(
     .iter()
     .filter(|c| c.commit_type == CCT::Test)
     .collect();
+
+  if let Some(date) = date {
+    writeln!(w, "# {} ({})", tag, date)?;
+  } else {
+    writeln!(w, "# {}", tag)?;
+  }
 
   if !fix.is_empty() {
     writeln!(w, "\n### Bug Fixes\n")?;

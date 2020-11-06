@@ -30,7 +30,8 @@ impl Kokai {
         }
       }
     } else {
-      let commits: Vec<ConventionalCommit> = Git::new(&self.repository)
+      let git = Git::new(&self.repository);
+      let commits: Vec<ConventionalCommit> = git
         .get_all_commits_until_tag(&tag)
         .into_iter()
         .map(|c| ConventionalCommit::try_from(c))
@@ -40,6 +41,8 @@ impl Kokai {
       let mut stdout = std::io::stdout();
       crate::format::angular::print_conventional_commit_release(
         &mut stdout,
+        &tag,
+        Some(git.get_commit_date(&tag)),
         &commits,
         crate::format::FormatOptions { show_all: true },
       )

@@ -1,4 +1,5 @@
 pub use crate::git::commit::Commit;
+use chrono::prelude::*;
 use git2::Repository;
 use std::collections::HashSet;
 
@@ -39,6 +40,19 @@ impl Git {
       .map(|c| c.peel_to_commit().unwrap())
       .map(Commit::from)
       .collect()
+  }
+
+  pub fn get_commit_date(&self, from: &String) -> String {
+    let repo = self.repository();
+    let start_commit = repo
+      .revparse_single(&from)
+      .unwrap()
+      .peel_to_commit()
+      .unwrap();
+
+    let datetime = FixedOffset::east(60 * start_commit.time().offset_minutes())
+      .timestamp(start_commit.time().seconds(), 0);
+    format!("{}", datetime.format("%Y-%m-%d"))
   }
 
   pub fn get_all_commits_until_tag(&self, from: &String) -> Vec<Commit> {
