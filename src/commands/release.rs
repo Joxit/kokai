@@ -11,30 +11,35 @@ pub struct Release {
   pub repository: String,
   /// Create a release changelog from previous tag until this one.
   #[structopt(long = "tag")]
-  pub tag: Option<String>,
+  pub tag: String,
+  /// Explicit ame for the release. Useful when tag is a commit or HEAD.
+  #[structopt(long = "name")]
+  pub name: Option<String>,
 }
 
 impl Release {
   pub fn exec(&self) {
-    if let Some(tag) = &self.tag {
-      let git = Git::new(&self.repository);
-      let commits: Vec<ConventionalCommit> = git
-        .get_all_commits_until_tag(&tag)
-        .into_iter()
-        .map(|c| ConventionalCommit::try_from(c))
-        .filter(|c| c.is_ok())
-        .map(|c| c.unwrap())
-        .collect();
-      let mut stdout = std::io::stdout();
-      crate::format::angular::print_conventional_commit_release(
-        &mut stdout,
-        &tag,
-        Some(git.get_commit_date(&tag)),
-        &commits,
-        crate::format::FormatOptions { show_all: true },
-      )
-      .unwrap();
-  
-    }
+    let name = if let Some(name) = &self.name {
+      name
+    } else {
+      &self.tag
+    };
+    let git = Git::new(&self.repository);
+    let commits: Vec<ConventionalCommit> = git
+      .get_all_commits_until_tag(&self.tag)
+      .into_iter()
+      .map(|c| ConventionalCommit::try_from(c))
+      .filter(|c| c.is_ok())
+      .map(|c| c.unwrap())
+      .collect();
+    let mut stdout = std::io::stdout();
+    crate::format::angular::print_conventional_commit_release(
+      &mut stdout,
+      &name,
+      Some(git.get_commit_date(&self.tag)),
+      &commits,
+      crate::format::FormatOptions { show_all: true },
+    )
+    .unwrap();
   }
 }

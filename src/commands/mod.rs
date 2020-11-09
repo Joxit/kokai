@@ -2,8 +2,8 @@ use crate::commands::changelog::Changelog;
 use crate::commands::release::Release;
 use structopt::StructOpt;
 
-mod release;
 mod changelog;
+mod release;
 
 #[derive(Debug, StructOpt)]
 pub enum Kokai {
