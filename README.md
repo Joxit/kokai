@@ -7,7 +7,7 @@
 
 公開: kokai => Release/publish
 
-Kokai allows you to create changelog for your releases and full changelog for your projects. It is based on Conventional Commit (for now) to have a pleasant reading of the changelog.
+Kokai allows you to create changelog for your releases and full changelog for your projects. It is based on Conventional Commits (for now) to have a pleasant reading of the changelog.
 
 ## All kokai commands
 

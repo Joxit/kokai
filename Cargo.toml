@@ -2,7 +2,15 @@
 name = "kokai"
 version = "0.1.0"
 authors = ["Jones Magloire @Joxit"]
+description = "Create changelog for your releases and full changelog for your projects using Conventional Commits."
 edition = "2018"
+license = "MIT"
+repository = "https://github.com/Joxit/kokai"
+homepage = "https://github.com/Joxit/kokai"
+documentation = "https://docs.rs/kokai/"
+readme = "README.md"
+keywords = ["cli", "release", "changelog", "git", "conventional-commits"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 structopt = "^0.3"
