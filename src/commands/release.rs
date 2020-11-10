@@ -9,10 +9,10 @@ pub struct Release {
   /// Path to the git repository
   #[structopt(default_value = ".")]
   pub repository: String,
-  /// Create a release changelog from previous tag until this one.
+  /// Create a release changelog from previous tag until this one. Can be a tag, commit hash or branch.
   #[structopt(long = "tag")]
   pub tag: String,
-  /// Explicit ame for the release. Useful when tag is a commit or HEAD.
+  /// Explicit name for the release. Useful when tag is a commit or HEAD.
   #[structopt(long = "name")]
   pub name: Option<String>,
 }

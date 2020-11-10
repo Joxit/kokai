@@ -10,7 +10,7 @@ pub enum Kokai {
   /// Create a release changelog for a specified tag.
   #[structopt(name = "release")]
   Release(Release),
-  /// Create a full changelog for the full history.
+  /// Create a full changelog of your project.
   #[structopt(name = "changelog")]
   Changelog(Changelog),
 }

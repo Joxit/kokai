@@ -9,7 +9,7 @@ pub struct Changelog {
   /// Path to the git repository
   #[structopt(default_value = ".")]
   pub repository: String,
-  /// Create a release changelog from previous tag until this one.
+  /// Create a full changelog from the first commit until this tag. Can be a tag, commit hash or branch.
   #[structopt(long = "tag")]
   pub tag: Option<String>,
 }
