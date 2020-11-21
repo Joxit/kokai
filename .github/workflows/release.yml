@@ -23,7 +23,7 @@ jobs:
         CRATE_IO_ACCESS_TOKEN: ${{ secrets.CRATE_IO_ACCESS_TOKEN }}
       run: cargo publish --token $CRATE_IO_ACCESS_TOKEN
     - name: Create Release Note
-      run: target/release/kokai release --tag ${{ github.ref }} . > RELEASE_NOTE.md
+      run: target/release/kokai release --ref ${{ github.ref }} --tag-from-ref . > RELEASE_NOTE.md
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -43,4 +43,5 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./target/release/kokai
+        asset_content_type: application/octet-stream
         asset_name: kokai-linux-x86_64

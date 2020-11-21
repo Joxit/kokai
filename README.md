@@ -12,7 +12,7 @@ Kokai allows you to create changelog for your releases and full changelog for yo
 ## All kokai commands
 
 ```
-kokai 0.1.0
+kokai 0.2.0
 
 USAGE:
     kokai <SUBCOMMAND>
@@ -30,20 +30,23 @@ SUBCOMMANDS:
 ### Release
 
 ```
-kokai-release 0.1.0
+kokai-release 0.2.0
 Jones Magloire @Joxit
 Create a release changelog for a specified tag
 
 USAGE:
-    kokai release [OPTIONS] --tag <tag> [repository]
+    kokai release [FLAGS] [OPTIONS] --ref <ref> [repository]
 
 FLAGS:
-    -h, --help       Prints help information
-    -V, --version    Prints version information
+    -h, --help            Prints help information
+        --tag-from-ref    Get the tag of the ref commit and use it as a release name. This is like `git describe --tags
+                          --exact-match`
+    -V, --version         Prints version information
 
 OPTIONS:
         --name <name>    Explicit name for the release. Useful when tag is a commit or HEAD
-        --tag <tag>      Create a release changelog from previous tag until this one. Can be a tag, commit hash or branch
+        --ref <ref>      Create a release changelog from previous tag until this ref. Can be a tag, commit hash or
+                         branch
 
 ARGS:
     <repository>    Path to the git repository [default: .]
@@ -52,9 +55,9 @@ ARGS:
 ### Changelog
 
 ```
-kokai-changelog 0.1.0
+kokai-changelog 0.2.0
 Jones Magloire @Joxit
-Create a full changelog for the full history
+Create a full changelog of your project
 
 USAGE:
     kokai changelog [OPTIONS] [repository]
@@ -64,7 +67,7 @@ FLAGS:
     -V, --version    Prints version information
 
 OPTIONS:
-        --tag <tag>    Create a release changelog from the first commit until this tag. Can be a tag, commit hash or branch
+        --ref <tag>    Create a full changelog from the first commit until this ref. Can be a tag, commit hash or branch
 
 ARGS:
     <repository>    Path to the git repository [default: .]

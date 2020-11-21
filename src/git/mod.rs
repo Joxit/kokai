@@ -42,6 +42,22 @@ impl Git {
       .collect()
   }
 
+  pub fn get_tag_of(&self, from: &String) -> Option<String> {
+    let repo = self.repository();
+    let from_commit = repo
+      .revparse_single(&from)
+      .unwrap()
+      .peel_to_commit()
+      .unwrap();
+    let from_commit = format!("{}", from_commit.id());
+
+    self
+      .get_all_tags()
+      .iter()
+      .find(|(commit, _)| commit == &from_commit)
+      .map(|(_, tag)| tag.clone())
+  }
+
   pub fn get_commit_date(&self, from: &String) -> String {
     let repo = self.repository();
     let start_commit = repo
