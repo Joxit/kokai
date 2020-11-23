@@ -1,9 +1,11 @@
 pub use crate::git::commit::Commit;
+use crate::git::traits::{Git2CommitTrait, Git2RepositoryTrait};
 use chrono::prelude::*;
 use git2::Repository;
 use std::collections::HashSet;
 
 mod commit;
+mod traits;
 
 #[derive(Debug, Clone)]
 pub struct Git {
@@ -23,12 +25,7 @@ impl Git {
   pub fn get_all_commits_before(&self, from: &String) -> Vec<Commit> {
     let repo = self.repository();
     let mut walk = repo.revwalk().unwrap();
-
-    let start_commit = repo
-      .revparse_single(&from)
-      .unwrap()
-      .peel_to_commit()
-      .unwrap();
+    let start_commit = repo.get_commit_from_ref(&from);
 
     walk.push(start_commit.id()).unwrap();
     walk.set_sorting(git2::Sort::TOPOLOGICAL).unwrap();
@@ -36,7 +33,7 @@ impl Git {
     walk
       .into_iter()
       .map(|c| c.unwrap())
-      .map(|c| repo.revparse_single(format!("{}", c).as_str()).unwrap())
+      .map(|c| repo.revparse_single(&c.to_string()).unwrap())
       .map(|c| c.peel_to_commit().unwrap())
       .map(Commit::from)
       .collect()
@@ -44,12 +41,7 @@ impl Git {
 
   pub fn get_tag_of(&self, from: &String) -> Option<String> {
     let repo = self.repository();
-    let from_commit = repo
-      .revparse_single(&from)
-      .unwrap()
-      .peel_to_commit()
-      .unwrap();
-    let from_commit = format!("{}", from_commit.id());
+    let from_commit = repo.get_commit_from_ref(&from).id_as_string();
 
     self
       .get_all_tags()
@@ -60,11 +52,7 @@ impl Git {
 
   pub fn get_commit_date(&self, from: &String) -> String {
     let repo = self.repository();
-    let start_commit = repo
-      .revparse_single(&from)
-      .unwrap()
-      .peel_to_commit()
-      .unwrap();
+    let start_commit = repo.get_commit_from_ref(&from);
 
     let datetime = FixedOffset::east(60 * start_commit.time().offset_minutes())
       .timestamp(start_commit.time().seconds(), 0);
@@ -75,11 +63,8 @@ impl Git {
     let repo = self.repository();
     let mut walk = repo.revwalk().unwrap();
 
-    let start_commit = repo
-      .revparse_single(&from)
-      .unwrap()
-      .peel_to_commit()
-      .unwrap();
+    let start_commit = repo.get_commit_from_ref(&from);
+
     let all_tags = self.get_all_tags();
     let tag_ids: HashSet<&String> = all_tags.iter().map(|(id, _)| id).collect();
 
@@ -89,12 +74,12 @@ impl Git {
     let iter = walk
       .into_iter()
       .map(|c| c.unwrap())
-      .map(|c| repo.revparse_single(format!("{}", c).as_str()).unwrap());
+      .map(|c| repo.revparse_single(&c.to_string()).unwrap());
 
     let mut result = vec![];
     for object in iter {
       if let Ok(commit) = object.clone().peel_to_commit() {
-        if result.len() != 0 && tag_ids.contains(&format!("{}", commit.id())) {
+        if result.len() != 0 && tag_ids.contains(&commit.id_as_string()) {
           return result;
         }
         result.push(Commit::from(commit));
@@ -109,7 +94,7 @@ impl Git {
     self
       .repository()
       .tag_foreach(|id, name| {
-        res.push((format!("{}", id), remove_ref_tags(name)));
+        res.push((id.to_string(), remove_ref_tags(name)));
         true
       })
       .unwrap();
