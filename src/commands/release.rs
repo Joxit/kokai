@@ -1,5 +1,6 @@
 use crate::git::Git;
 use crate::parser::ConventionalCommit;
+use crate::Error;
 use std::convert::TryFrom;
 use structopt::StructOpt;
 
@@ -21,17 +22,17 @@ pub struct Release {
 }
 
 impl Release {
-  pub fn exec(&self) {
+  pub fn exec(&self) -> Result<(), Error> {
     let git = Git::new(&self.repository);
     let name = if let Some(name) = &self.name {
       name.clone()
     } else if self.tag_from_ref {
-      git.get_tag_of(&self.r#ref).unwrap()
+      git.get_tag_of(&self.r#ref)?
     } else {
       self.r#ref.clone()
     };
     let commits: Vec<ConventionalCommit> = git
-      .get_all_commits_until_tag(&self.r#ref)
+      .get_all_commits_until_tag(&self.r#ref)?
       .into_iter()
       .map(|c| ConventionalCommit::try_from(c))
       .filter(|c| c.is_ok())
@@ -46,5 +47,6 @@ impl Release {
       crate::format::FormatOptions { show_all: true },
     )
     .unwrap();
+    Ok(())
   }
 }

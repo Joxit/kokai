@@ -1,5 +1,6 @@
 use crate::commands::changelog::Changelog;
 use crate::commands::release::Release;
+use crate::Error;
 use structopt::StructOpt;
 
 mod changelog;
@@ -16,10 +17,11 @@ pub enum Kokai {
 }
 
 impl Kokai {
-  pub fn exec(&self) {
+  pub fn exec(&self) -> Result<(), Error> {
     match self {
-      Kokai::Release(executable) => executable.exec(),
-      Kokai::Changelog(executable) => executable.exec(),
+      Kokai::Release(executable) => executable.exec()?,
+      Kokai::Changelog(executable) => executable.exec()?,
     }
+    Ok(())
   }
 }

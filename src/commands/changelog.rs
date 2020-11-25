@@ -1,5 +1,6 @@
 use crate::git::Git;
 use crate::parser::ConventionalCommit;
+use crate::Error;
 use std::convert::TryFrom;
 use structopt::StructOpt;
 
@@ -15,13 +16,14 @@ pub struct Changelog {
 }
 
 impl Changelog {
-  pub fn exec(&self) {
+  pub fn exec(&self) -> Result<(), Error> {
     if let Some(tag) = &self.tag {
-      for c in Git::new(&self.repository).get_all_commits_before(&tag) {
+      for c in Git::new(&self.repository).get_all_commits_before(&tag)? {
         if let Ok(c) = ConventionalCommit::try_from(c) {
           println!("{}", c);
         }
       }
     }
+    Ok(())
   }
 }
