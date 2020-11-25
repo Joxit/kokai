@@ -1,3 +1,4 @@
+use crate::format::formatters::Markdown;
 use crate::format::FormatOptions;
 use crate::parser::{ConventionalCommit as CC, ConventionalCommitType as CCT};
 use std::io::Write;
@@ -61,69 +62,69 @@ pub fn print_conventional_commit_release<W: Write>(
   }
 
   if !fix.is_empty() {
-    writeln!(w, "\n### Bug Fixes\n")?;
+    writeln!(w, "\n### :beetle: Bug Fixes\n")?;
     for c in &fix {
-      writeln!(w, "* {}", c)?;
+      writeln!(w, "* {}", c.markdown())?;
     }
   }
   if !refactor.is_empty() {
-    writeln!(w, "\n### Code Refactoring\n")?;
+    writeln!(w, "\n### :ghost: Code Refactoring\n")?;
     for c in &refactor {
-      writeln!(w, "* {}", c)?;
+      writeln!(w, "* {}", c.markdown())?;
     }
   }
   if !feat.is_empty() {
-    writeln!(w, "\n### Features\n")?;
+    writeln!(w, "\n### :sparkles: Features\n")?;
     for c in &feat {
-      writeln!(w, "* {}", c)?;
+      writeln!(w, "* {}", c.markdown())?;
     }
   }
   if !build.is_empty() {
-    writeln!(w, "\n### Build\n")?;
+    writeln!(w, "\n### :shipit: Build\n")?;
     for c in &build {
-      writeln!(w, "* {}", c)?;
+      writeln!(w, "* {}", c.markdown())?;
     }
   }
   if !perf.is_empty() {
-    writeln!(w, "\n### Performance Improvements\n")?;
+    writeln!(w, "\n### :racehorse: Performance Improvements\n")?;
     for c in &perf {
-      writeln!(w, "* {}", c)?;
+      writeln!(w, "* {}", c.markdown())?;
     }
   }
   if !revert.is_empty() {
-    writeln!(w, "\n### Reverts\n")?;
+    writeln!(w, "\n### :arrow_backward: Reverts\n")?;
     for c in &revert {
-      writeln!(w, "* {}", c)?;
+      writeln!(w, "* {}", c.markdown())?;
     }
   }
   if !test.is_empty() && opts.show_all {
-    writeln!(w, "\n### Tests\n")?;
+    writeln!(w, "\n### :heavy_check_mark: Tests\n")?;
     for c in &test {
-      writeln!(w, "* {}", c)?;
+      writeln!(w, "* {}", c.markdown())?;
     }
   }
   if !style.is_empty() && opts.show_all {
-    writeln!(w, "\n### Style Changes\n")?;
+    writeln!(w, "\n### :art: Style Changes\n")?;
     for c in &style {
-      writeln!(w, "* {}", c)?;
+      writeln!(w, "* {}", c.markdown())?;
     }
   }
   if !docs.is_empty() && opts.show_all {
-    writeln!(w, "\n### Documentation\n")?;
+    writeln!(w, "\n### :memo: Documentation\n")?;
     for c in &docs {
-      writeln!(w, "* {}", c)?;
+      writeln!(w, "* {}", c.markdown())?;
     }
   }
   if !ci.is_empty() && opts.show_all {
-    writeln!(w, "\n### Continuous Integration\n")?;
+    writeln!(w, "\n### :rocket: Continuous Integration\n")?;
     for c in &ci {
-      writeln!(w, "* {}", c)?;
+      writeln!(w, "* {}", c.markdown())?;
     }
   }
   if !chore.is_empty() && opts.show_all {
-    writeln!(w, "\n### Chore\n")?;
+    writeln!(w, "\n### :green_apple: Chore\n")?;
     for c in &chore {
-      writeln!(w, "* {}", c)?;
+      writeln!(w, "* {}", c.markdown())?;
     }
   }
 
