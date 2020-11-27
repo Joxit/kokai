@@ -1,15 +1,16 @@
+use crate::error::{Error, IntoError};
 use git2::{Commit, Repository};
 pub trait Git2RepositoryTrait {
-  fn get_commit_from_ref(&self, commit: &String) -> Commit;
+  fn get_commit_from_ref(&self, commit: &String) -> Result<Commit, Error>;
 }
 
 impl Git2RepositoryTrait for Repository {
-  fn get_commit_from_ref(&self, commit: &String) -> Commit {
+  fn get_commit_from_ref(&self, commit: &String) -> Result<Commit, Error> {
     self
       .revparse_single(&commit)
-      .unwrap()
+      .into_error()?
       .peel_to_commit()
-      .unwrap()
+      .into_error()
   }
 }
 

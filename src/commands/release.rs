@@ -42,7 +42,7 @@ impl Release {
     crate::format::angular::print_conventional_commit_release(
       &mut stdout,
       &name,
-      Some(git.get_commit_date(&self.r#ref)),
+      Some(git.get_commit_date(&self.r#ref)?),
       &commits,
       crate::format::FormatOptions { show_all: true },
     )

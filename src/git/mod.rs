@@ -26,7 +26,7 @@ impl Git {
   pub fn get_all_commits_before(&self, from: &String) -> Result<Vec<Commit>, Error> {
     let repo = self.repository()?;
     let mut walk = repo.revwalk().into_error()?;
-    let start_commit = repo.get_commit_from_ref(&from);
+    let start_commit = repo.get_commit_from_ref(&from)?;
 
     walk.push(start_commit.id()).into_error()?;
     walk.set_sorting(git2::Sort::TOPOLOGICAL).into_error()?;
@@ -44,9 +44,9 @@ impl Git {
 
   pub fn get_tag_of(&self, from: &String) -> Result<String, Error> {
     let repo = self.repository()?;
-    let from_commit = repo.get_commit_from_ref(&from).id_as_string();
+    let from_commit = repo.get_commit_from_ref(&from)?.id_as_string();
     let tag = self
-      .get_all_tags()
+      .get_all_tags()?
       .iter()
       .find(|(commit, _)| commit == &from_commit)
       .map(|(_, tag)| tag.clone());
@@ -61,34 +61,32 @@ impl Git {
     }
   }
 
-  pub fn get_commit_date(&self, from: &String) -> String {
-    let repo = self.repository().unwrap();
-    let start_commit = repo.get_commit_from_ref(&from);
+  pub fn get_commit_date(&self, from: &String) -> Result<String, Error> {
+    let repo = self.repository()?;
+    let start_commit = repo.get_commit_from_ref(&from)?;
 
     let datetime = FixedOffset::east(60 * start_commit.time().offset_minutes())
       .timestamp(start_commit.time().seconds(), 0);
-    format!("{}", datetime.format("%Y-%m-%d"))
+    Ok(format!("{}", datetime.format("%Y-%m-%d")))
   }
 
   pub fn get_all_commits_until_tag(&self, from: &String) -> Result<Vec<Commit>, Error> {
     let repo = self.repository()?;
     let mut walk = repo.revwalk().into_error()?;
 
-    let start_commit = repo.get_commit_from_ref(&from);
+    let start_commit = repo.get_commit_from_ref(&from)?;
 
-    let all_tags = self.get_all_tags();
+    let all_tags = self.get_all_tags()?;
     let tag_ids: HashSet<&String> = all_tags.iter().map(|(id, _)| id).collect();
 
     walk.push(start_commit.id())?;
     walk.set_sorting(git2::Sort::TOPOLOGICAL)?;
 
-    let iter = walk
-      .into_iter()
-      .map(|c| c.unwrap())
-      .map(|c| repo.revparse_single(&c.to_string()).unwrap());
-
     let mut result = vec![];
-    for object in iter {
+    for oid in walk.into_iter() {
+      let object = repo
+        .revparse_single(&oid.into_error()?.to_string())
+        .into_error()?;
       if let Ok(commit) = object.clone().peel_to_commit() {
         if result.len() != 0 && tag_ids.contains(&commit.id_as_string()) {
           return Ok(result);
@@ -99,18 +97,17 @@ impl Git {
     Ok(result)
   }
 
-  pub fn get_all_tags(&self) -> Vec<(String, String)> {
+  pub fn get_all_tags(&self) -> Result<Vec<(String, String)>, Error> {
     let mut res = vec![];
     // Equivalent to self.repository().unwrap().references() with ref filter
     self
-      .repository()
-      .unwrap()
+      .repository()?
       .tag_foreach(|id, name| {
         res.push((id.to_string(), remove_ref_tags(name)));
         true
       })
-      .unwrap();
-    res
+      .into_error()?;
+    Ok(res)
   }
 }
 
