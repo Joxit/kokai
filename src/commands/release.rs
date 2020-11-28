@@ -1,6 +1,6 @@
+use crate::error::{Error, IntoError};
 use crate::git::Git;
 use crate::parser::ConventionalCommit;
-use crate::Error;
 use std::convert::TryFrom;
 use structopt::StructOpt;
 
@@ -46,7 +46,6 @@ impl Release {
       &commits,
       crate::format::FormatOptions { show_all: true },
     )
-    .unwrap();
-    Ok(())
+    .into_error()
   }
 }

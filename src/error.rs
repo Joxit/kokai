@@ -37,3 +37,14 @@ impl<T> IntoError<T> for Result<T, git2::Error> {
     self.map_err(|_| Error::new(msg))
   }
 }
+
+impl<T> IntoError<T> for Result<T, std::io::Error> {
+  fn into_error(self) -> Result<T, Error> {
+    self.map_err(|error| Error {
+      message: format!("{}", error),
+    })
+  }
+  fn into_error_msg<S: std::string::ToString>(self, msg: S) -> Result<T, Error> {
+    self.map_err(|_| Error::new(msg))
+  }
+}
