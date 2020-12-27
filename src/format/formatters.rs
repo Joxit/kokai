@@ -1,3 +1,5 @@
+use crate::format::FormatOptions;
+
 pub trait Markdown {
-  fn markdown(&self) -> String;
+  fn markdown(&self, opts: &FormatOptions) -> String;
 }

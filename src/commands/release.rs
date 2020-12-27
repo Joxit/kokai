@@ -1,4 +1,5 @@
 use crate::error::{Error, IntoError};
+use crate::format::FormatURL;
 use crate::git::Git;
 use crate::parser::ConventionalCommit;
 use std::convert::TryFrom;
@@ -19,6 +20,13 @@ pub struct Release {
   /// Get the tag of the ref commit and use it as a release name. This is like `git describe --tags --exact-match`
   #[structopt(long = "tag-from-ref")]
   pub tag_from_ref: bool,
+  /// Add links to commits/issues/pr with specified url format (github/gitlab...).
+  /// For commits only using github url format, use github:commits. For gitlab with commits and issues use gitlab:commits,issues.
+  #[structopt(long = "add-links")]
+  pub add_links: Option<String>,
+  /// The git url of the project. Should be a url using http protocol for links.
+  #[structopt(long = "git-url")]
+  pub git_url: Option<String>,
 }
 
 impl Release {
@@ -30,6 +38,11 @@ impl Release {
       git.get_tag_of(&self.r#ref)?
     } else {
       self.r#ref.clone()
+    };
+    let git_url = if let Some(git_url) = &self.git_url {
+      git_url.to_string()
+    } else {
+      git.url()?
     };
     let commits: Vec<ConventionalCommit> = git
       .get_all_commits_until_tag(&self.r#ref)?
@@ -44,7 +57,10 @@ impl Release {
       &name,
       Some(git.get_commit_date(&self.r#ref)?),
       &commits,
-      crate::format::FormatOptions { show_all: true },
+      crate::format::FormatOptions {
+        show_all: true,
+        format_url: FormatURL::new(git_url, self.add_links.clone()),
+      },
     )
     .into_error()
   }

@@ -109,6 +109,18 @@ impl Git {
       .into_error()?;
     Ok(res)
   }
+
+  pub fn url(&self) -> Result<String, Error> {
+    let config = self.repository()?.config()?;
+
+    for entry in &config.entries(Some("url"))? {
+      let entry = entry?;
+      if let Some(url) = entry.value() {
+        return Ok(format!("{}", format_git_url(url)));
+      }
+    }
+    Err(Error::new("URL for your project not found."))
+  }
 }
 
 fn remove_ref_tags(name: &[u8]) -> String {
@@ -117,4 +129,37 @@ fn remove_ref_tags(name: &[u8]) -> String {
     .chars()
     .skip(10)
     .collect::<String>()
+}
+
+fn format_git_url<S: std::string::ToString>(url: S) -> String {
+  let url = url.to_string();
+  let url = url.strip_suffix(".git").unwrap_or(&url).to_string();
+  if url.starts_with("git@") {
+    url.replacen(":", "/", 1).replacen("git@", "https://", 1)
+  } else {
+    url
+  }
+}
+
+#[cfg(test)]
+mod test {
+  #[test]
+  pub fn format_git_url() {
+    assert_eq!(
+      super::format_git_url("https://example.com/user/project"),
+      "https://example.com/user/project"
+    );
+    assert_eq!(
+      super::format_git_url("https://example.com/user/project.git"),
+      "https://example.com/user/project"
+    );
+    assert_eq!(
+      super::format_git_url("git@example.com:user/project"),
+      "https://example.com/user/project"
+    );
+    assert_eq!(
+      super::format_git_url("git@example.com:user/project.git"),
+      "https://example.com/user/project"
+    );
+  }
 }

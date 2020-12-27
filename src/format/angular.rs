@@ -64,67 +64,67 @@ pub fn print_conventional_commit_release<W: Write>(
   if !fix.is_empty() {
     writeln!(w, "\n### :beetle: Bug Fixes\n")?;
     for c in &fix {
-      writeln!(w, "* {}", c.markdown())?;
+      writeln!(w, "* {}", c.markdown(&opts))?;
     }
   }
   if !refactor.is_empty() {
     writeln!(w, "\n### :ghost: Code Refactoring\n")?;
     for c in &refactor {
-      writeln!(w, "* {}", c.markdown())?;
+      writeln!(w, "* {}", c.markdown(&opts))?;
     }
   }
   if !feat.is_empty() {
     writeln!(w, "\n### :sparkles: Features\n")?;
     for c in &feat {
-      writeln!(w, "* {}", c.markdown())?;
+      writeln!(w, "* {}", c.markdown(&opts))?;
     }
   }
   if !build.is_empty() {
     writeln!(w, "\n### :shipit: Build\n")?;
     for c in &build {
-      writeln!(w, "* {}", c.markdown())?;
+      writeln!(w, "* {}", c.markdown(&opts))?;
     }
   }
   if !perf.is_empty() {
     writeln!(w, "\n### :racehorse: Performance Improvements\n")?;
     for c in &perf {
-      writeln!(w, "* {}", c.markdown())?;
+      writeln!(w, "* {}", c.markdown(&opts))?;
     }
   }
   if !revert.is_empty() {
     writeln!(w, "\n### :arrow_backward: Reverts\n")?;
     for c in &revert {
-      writeln!(w, "* {}", c.markdown())?;
+      writeln!(w, "* {}", c.markdown(&opts))?;
     }
   }
   if !test.is_empty() && opts.show_all {
     writeln!(w, "\n### :heavy_check_mark: Tests\n")?;
     for c in &test {
-      writeln!(w, "* {}", c.markdown())?;
+      writeln!(w, "* {}", c.markdown(&opts))?;
     }
   }
   if !style.is_empty() && opts.show_all {
     writeln!(w, "\n### :art: Style Changes\n")?;
     for c in &style {
-      writeln!(w, "* {}", c.markdown())?;
+      writeln!(w, "* {}", c.markdown(&opts))?;
     }
   }
   if !docs.is_empty() && opts.show_all {
     writeln!(w, "\n### :memo: Documentation\n")?;
     for c in &docs {
-      writeln!(w, "* {}", c.markdown())?;
+      writeln!(w, "* {}", c.markdown(&opts))?;
     }
   }
   if !ci.is_empty() && opts.show_all {
     writeln!(w, "\n### :rocket: Continuous Integration\n")?;
     for c in &ci {
-      writeln!(w, "* {}", c.markdown())?;
+      writeln!(w, "* {}", c.markdown(&opts))?;
     }
   }
   if !chore.is_empty() && opts.show_all {
     writeln!(w, "\n### :green_apple: Chore\n")?;
     for c in &chore {
-      writeln!(w, "* {}", c.markdown())?;
+      writeln!(w, "* {}", c.markdown(&opts))?;
     }
   }
 

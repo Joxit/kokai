@@ -1,4 +1,5 @@
 use crate::format::formatters::Markdown;
+use crate::format::FormatOptions;
 use crate::git::Commit;
 use regex::Regex;
 
@@ -105,7 +106,7 @@ impl std::fmt::Display for ConventionalCommitType {
 }
 
 impl Markdown for ConventionalCommit {
-  fn markdown(&self) -> String {
+  fn markdown(&self, opts: &FormatOptions) -> String {
     let scope = if let Some(scope) = self.scope.clone() {
       format!("**{}:** ", scope)
     } else {
