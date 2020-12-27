@@ -19,6 +19,17 @@ pub enum URLFormatTypes {
   Gitlab,
 }
 
+impl FormatOptions {
+  pub fn commit_url(&self, id: &String) -> Option<String> {
+    if let Some(format_url) = &self.format_url {
+      if format_url.commits {
+        return Some(format_url.commit(id));
+      }
+    }
+    None
+  }
+}
+
 impl FormatURL {
   pub fn new(url: String, add_links: Option<String>) -> Option<FormatURL> {
     let add_links = if let Some(add_links) = add_links {
@@ -51,5 +62,12 @@ impl FormatURL {
       issues,
       pull_requests,
     })
+  }
+
+  pub fn commit(&self, id: &String) -> String {
+    match self.url_format_type {
+      URLFormatTypes::Github => format!("{}/commit/{}", self.url, id),
+      URLFormatTypes::Gitlab => format!("{}/-/commit/{}", self.url, id),
+    }
   }
 }

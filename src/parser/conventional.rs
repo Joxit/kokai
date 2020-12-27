@@ -108,11 +108,16 @@ impl std::fmt::Display for ConventionalCommitType {
 impl Markdown for ConventionalCommit {
   fn markdown(&self, opts: &FormatOptions) -> String {
     let scope = if let Some(scope) = self.scope.clone() {
-      format!("**{}:** ", scope)
+      format!("{}: ", scope.bold())
     } else {
       String::new()
     };
-    let small_id = self.id.chars().take(8).collect::<String>();
-    format!("{}{} ({})", scope, self.summary, small_id)
+    let small_id = self.id.chars().take(8).collect::<String>().code();
+    let id = if let Some(commit_url) = &opts.commit_url(&self.id) {
+      small_id.link(commit_url)
+    } else {
+      small_id
+    };
+    format!("{}{} ({})", scope, self.summary, id)
   }
 }
