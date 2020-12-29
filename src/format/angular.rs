@@ -56,75 +56,75 @@ pub fn print_conventional_commit_release<W: Write>(
     .collect();
 
   if let Some(date) = date {
-    writeln!(w, "# {} ({})", tag, date)?;
+    writeln!(w, "{} ({})", tag.h1(), date)?;
   } else {
-    writeln!(w, "# {}", tag)?;
+    writeln!(w, "{}", tag.h1())?;
   }
 
   if !fix.is_empty() {
-    writeln!(w, "\n### :beetle: Bug Fixes\n")?;
+    writeln!(w, "\n{}\n", ":beetle: Bug Fixes".h3())?;
     for c in &fix {
-      writeln!(w, "* {}", c.markdown(&opts))?;
+      writeln!(w, "{}", c.markdown(&opts).list())?;
     }
   }
   if !refactor.is_empty() {
-    writeln!(w, "\n### :ghost: Code Refactoring\n")?;
+    writeln!(w, "\n{}\n", ":ghost: Code Refactoring".h3())?;
     for c in &refactor {
-      writeln!(w, "* {}", c.markdown(&opts))?;
+      writeln!(w, "{}", c.markdown(&opts).list())?;
     }
   }
   if !feat.is_empty() {
-    writeln!(w, "\n### :sparkles: Features\n")?;
+    writeln!(w, "\n{}\n", ":sparkles: Features".h3())?;
     for c in &feat {
-      writeln!(w, "* {}", c.markdown(&opts))?;
+      writeln!(w, "{}", c.markdown(&opts).list())?;
     }
   }
   if !build.is_empty() {
-    writeln!(w, "\n### :shipit: Build\n")?;
+    writeln!(w, "\n{}\n", ":wrench: Build".h3())?;
     for c in &build {
-      writeln!(w, "* {}", c.markdown(&opts))?;
+      writeln!(w, "{}", c.markdown(&opts).list())?;
     }
   }
   if !perf.is_empty() {
-    writeln!(w, "\n### :racehorse: Performance Improvements\n")?;
+    writeln!(w, "\n{}\n", ":racehorse: Performance Improvements".h3())?;
     for c in &perf {
-      writeln!(w, "* {}", c.markdown(&opts))?;
+      writeln!(w, "{}", c.markdown(&opts).list())?;
     }
   }
   if !revert.is_empty() {
-    writeln!(w, "\n### :arrow_backward: Reverts\n")?;
+    writeln!(w, "\n{}\n", ":arrow_backward: Reverts".h3())?;
     for c in &revert {
-      writeln!(w, "* {}", c.markdown(&opts))?;
+      writeln!(w, "{}", c.markdown(&opts).list())?;
     }
   }
   if !test.is_empty() && opts.show_all {
-    writeln!(w, "\n### :heavy_check_mark: Tests\n")?;
+    writeln!(w, "\n{}\n", ":heavy_check_mark: Tests".h3())?;
     for c in &test {
-      writeln!(w, "* {}", c.markdown(&opts))?;
+      writeln!(w, "{}", c.markdown(&opts).list())?;
     }
   }
   if !style.is_empty() && opts.show_all {
-    writeln!(w, "\n### :art: Style Changes\n")?;
+    writeln!(w, "\n{}\n", ":art: Style Changes".h3())?;
     for c in &style {
-      writeln!(w, "* {}", c.markdown(&opts))?;
+      writeln!(w, "{}", c.markdown(&opts).list())?;
     }
   }
   if !docs.is_empty() && opts.show_all {
-    writeln!(w, "\n### :memo: Documentation\n")?;
+    writeln!(w, "\n{}\n", ":memo: Documentation".h3())?;
     for c in &docs {
-      writeln!(w, "* {}", c.markdown(&opts))?;
+      writeln!(w, "{}", c.markdown(&opts).list())?;
     }
   }
   if !ci.is_empty() && opts.show_all {
-    writeln!(w, "\n### :rocket: Continuous Integration\n")?;
+    writeln!(w, "\n{}\n", ":rocket: Continuous Integration".h3())?;
     for c in &ci {
-      writeln!(w, "* {}", c.markdown(&opts))?;
+      writeln!(w, "{}", c.markdown(&opts).list())?;
     }
   }
   if !chore.is_empty() && opts.show_all {
-    writeln!(w, "\n### :green_apple: Chore\n")?;
+    writeln!(w, "\n{}\n", ":green_apple: Chore".h3())?;
     for c in &chore {
-      writeln!(w, "* {}", c.markdown(&opts))?;
+      writeln!(w, "{}", c.markdown(&opts).list())?;
     }
   }
 
