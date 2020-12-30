@@ -12,6 +12,10 @@ readme = "README.md"
 keywords = ["cli", "release", "changelog", "git", "conventional-commits"]
 categories = ["command-line-utilities"]
 
+[[bin]]
+name = "kokai"
+path = "src/main.rs"
+
 [dependencies]
 structopt = "^0.3"
 regex = "^1.3"
