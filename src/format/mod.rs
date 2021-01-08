@@ -101,8 +101,8 @@ impl FormatURL {
 
   pub fn issue(&self, id: &String) -> String {
     match self.url_format_type {
-      URLFormatTypes::Github => format!("{}/issue/{}", self.url, id),
-      URLFormatTypes::Gitlab => format!("{}/-/issues/{}", self.url, id),
+      URLFormatTypes::Github => format!("{}/issues/{}", self.url, id.replace("#", "")),
+      URLFormatTypes::Gitlab => format!("{}/-/issues/{}", self.url, id.replace("#", "")),
     }
   }
 }
