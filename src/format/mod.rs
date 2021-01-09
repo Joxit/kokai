@@ -3,7 +3,8 @@ pub mod formatters;
 use regex::Regex;
 
 lazy_static! {
-  static ref GITHUB_ISSUES_REGEX: Regex = Regex::new("(^| |\\()(?P<id>#[0-9]+)($| |\\))").unwrap();
+  static ref ISSUES_REGEX: Regex = Regex::new("(^| |\\()(?P<id>#[0-9]+)($| |\\))").unwrap();
+  static ref GITLAB_MR_REGEX: Regex = Regex::new("(^| |\\()(?P<id>![0-9]+)($| |\\))").unwrap();
 }
 
 pub struct FormatOptions {
@@ -38,7 +39,28 @@ impl FormatOptions {
   pub fn get_all_issues(&self, summary: &String) -> Option<Vec<String>> {
     if let Some(format_url) = &self.format_url {
       if format_url.issues {
-        let ids = GITHUB_ISSUES_REGEX
+        let ids = ISSUES_REGEX
+          .captures_iter(summary)
+          .map(|caps| caps["id"].to_string())
+          .filter(|id| id.len() > 0)
+          .collect();
+        return Some(ids);
+      }
+    }
+    None
+  }
+
+  pub fn get_all_pull_requests(&self, summary: &String) -> Option<Vec<String>> {
+    if let Some(format_url) = &self.format_url {
+      if format_url.pull_requests && format_url.url_format_type == URLFormatTypes::Github {
+        let ids = ISSUES_REGEX
+          .captures_iter(summary)
+          .map(|caps| caps["id"].to_string())
+          .filter(|id| id.len() > 0)
+          .collect();
+        return Some(ids);
+      } else if format_url.pull_requests && format_url.url_format_type == URLFormatTypes::Gitlab {
+        let ids = GITLAB_MR_REGEX
           .captures_iter(summary)
           .map(|caps| caps["id"].to_string())
           .filter(|id| id.len() > 0)
@@ -52,6 +74,14 @@ impl FormatOptions {
   pub fn issue_link(&self, id: &String) -> Option<String> {
     if let Some(format_url) = &self.format_url {
       Some(format_url.issue(id))
+    } else {
+      None
+    }
+  }
+
+  pub fn pull_request_link(&self, id: &String) -> Option<String> {
+    if let Some(format_url) = &self.format_url {
+      Some(format_url.pull_request(id))
     } else {
       None
     }
@@ -105,18 +135,25 @@ impl FormatURL {
       URLFormatTypes::Gitlab => format!("{}/-/issues/{}", self.url, id.replace("#", "")),
     }
   }
+
+  pub fn pull_request(&self, id: &String) -> String {
+    match self.url_format_type {
+      URLFormatTypes::Github => format!("{}/pull/{}", self.url, id.replace("#", "")),
+      URLFormatTypes::Gitlab => format!("{}/-/merge_requests/{}", self.url, id.replace("!", "")),
+    }
+  }
 }
 
 #[cfg(test)]
 mod test {
   use super::*;
   #[test]
-  pub fn get_all_issues() {
+  fn get_all_issues() {
     for format_type in vec!["github:issues", "gitlab:issues"] {
       let opts = FormatOptions {
         show_all: true,
         format_url: FormatURL::new(
-          "git@github.com:joxit/kokai".to_string(),
+          "https://github.com/joxit/kokai".to_string(),
           Some(format_type.to_string()),
         ),
       };
@@ -150,5 +187,121 @@ mod test {
         Some(vec![])
       );
     }
+  }
+
+  #[test]
+  fn get_all_pull_requests_gitlab() {
+    let opts = FormatOptions {
+      show_all: true,
+      format_url: FormatURL::new(
+        "https://github.com/joxit/kokai".to_string(),
+        Some("gitlab:pr".to_string()),
+      ),
+    };
+
+    assert_eq!(
+      opts.get_all_pull_requests(&"!1".to_string()),
+      Some(vec!["!1".to_string()])
+    );
+    assert_eq!(
+      opts.get_all_pull_requests(&"!365 foo".to_string()),
+      Some(vec!["!365".to_string()])
+    );
+    assert_eq!(
+      opts.get_all_pull_requests(&"foo !35".to_string()),
+      Some(vec!["!35".to_string()])
+    );
+    assert_eq!(
+      opts.get_all_pull_requests(&"foo !35 bar".to_string()),
+      Some(vec!["!35".to_string()])
+    );
+    assert_eq!(
+      opts.get_all_pull_requests(&"foo (!35) bar".to_string()),
+      Some(vec!["!35".to_string()])
+    );
+    assert_eq!(
+      opts.get_all_pull_requests(&"foo (!35) bar (!36)".to_string()),
+      Some(vec!["!35".to_string(), "!36".to_string()])
+    );
+    assert_eq!(
+      opts.get_all_pull_requests(&"foo [!35] bar".to_string()),
+      Some(vec![])
+    );
+  }
+
+  #[test]
+  fn get_all_pull_requests_github() {
+    let opts = FormatOptions {
+      show_all: true,
+      format_url: FormatURL::new(
+        "https://github.com/joxit/kokai".to_string(),
+        Some("github:pr".to_string()),
+      ),
+    };
+
+    assert_eq!(
+      opts.get_all_pull_requests(&"#1".to_string()),
+      Some(vec!["#1".to_string()])
+    );
+    assert_eq!(
+      opts.get_all_pull_requests(&"#365 foo".to_string()),
+      Some(vec!["#365".to_string()])
+    );
+    assert_eq!(
+      opts.get_all_pull_requests(&"foo #35".to_string()),
+      Some(vec!["#35".to_string()])
+    );
+    assert_eq!(
+      opts.get_all_pull_requests(&"foo #35 bar".to_string()),
+      Some(vec!["#35".to_string()])
+    );
+    assert_eq!(
+      opts.get_all_pull_requests(&"foo (#35) bar".to_string()),
+      Some(vec!["#35".to_string()])
+    );
+    assert_eq!(
+      opts.get_all_pull_requests(&"foo (#35) bar (#36)".to_string()),
+      Some(vec!["#35".to_string(), "#36".to_string()])
+    );
+    assert_eq!(
+      opts.get_all_pull_requests(&"foo [#35] bar".to_string()),
+      Some(vec![])
+    );
+  }
+
+  #[test]
+  fn issue_pr_links() {
+    let github = FormatOptions {
+      show_all: true,
+      format_url: FormatURL::new(
+        "https://github.com/joxit/kokai".to_string(),
+        Some("github:issues".to_string()),
+      ),
+    };
+    let gitlab = FormatOptions {
+      show_all: true,
+      format_url: FormatURL::new(
+        "https://github.com/joxit/kokai".to_string(),
+        Some("gitlab:issues".to_string()),
+      ),
+    };
+
+    assert_eq!(
+      github.issue_link(&"#35".to_string()),
+      Some("https://github.com/joxit/kokai/issues/35".to_string())
+    );
+
+    assert_eq!(
+      github.pull_request_link(&"#35".to_string()),
+      Some("https://github.com/joxit/kokai/pull/35".to_string())
+    );
+    assert_eq!(
+      gitlab.issue_link(&"#35".to_string()),
+      Some("https://github.com/joxit/kokai/-/issues/35".to_string())
+    );
+    assert_eq!(
+      gitlab.pull_request_link(&"!35".to_string()),
+      Some("https://github.com/joxit/kokai/-/merge_requests/35".to_string())
+    );
   }
 }
