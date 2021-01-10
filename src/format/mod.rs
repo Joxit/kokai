@@ -39,11 +39,13 @@ impl FormatOptions {
   pub fn get_all_issues(&self, summary: &String) -> Option<Vec<String>> {
     if let Some(format_url) = &self.format_url {
       if format_url.issues {
-        let ids = ISSUES_REGEX
+        let mut ids: Vec<String> = ISSUES_REGEX
           .captures_iter(summary)
           .map(|caps| caps["id"].to_string())
           .filter(|id| id.len() > 0)
           .collect();
+        ids.sort();
+        ids.dedup();
         return Some(ids);
       }
     }
@@ -53,18 +55,22 @@ impl FormatOptions {
   pub fn get_all_pull_requests(&self, summary: &String) -> Option<Vec<String>> {
     if let Some(format_url) = &self.format_url {
       if format_url.pull_requests && format_url.url_format_type == URLFormatTypes::Github {
-        let ids = ISSUES_REGEX
+        let mut ids: Vec<String> = ISSUES_REGEX
           .captures_iter(summary)
           .map(|caps| caps["id"].to_string())
           .filter(|id| id.len() > 0)
           .collect();
+        ids.sort();
+        ids.dedup();
         return Some(ids);
       } else if format_url.pull_requests && format_url.url_format_type == URLFormatTypes::Gitlab {
-        let ids = GITLAB_MR_REGEX
+        let mut ids: Vec<String> = GITLAB_MR_REGEX
           .captures_iter(summary)
           .map(|caps| caps["id"].to_string())
           .filter(|id| id.len() > 0)
           .collect();
+        ids.sort();
+        ids.dedup();
         return Some(ids);
       }
     }
@@ -176,6 +182,10 @@ mod test {
       );
       assert_eq!(
         opts.get_all_issues(&"foo (#35) bar".to_string()),
+        Some(vec!["#35".to_string()])
+      );
+      assert_eq!(
+        opts.get_all_issues(&"foo (#35) bar #35".to_string()),
         Some(vec!["#35".to_string()])
       );
       assert_eq!(

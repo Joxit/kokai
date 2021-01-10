@@ -118,6 +118,17 @@ impl Markdown for ConventionalCommit {
     } else {
       small_id
     };
-    format!("{}{} ({})", scope, self.summary, id)
+    let mut summary = self.summary.to_string();
+    if let Some(issues) = opts.get_all_issues(&summary) {
+      for issue in issues {
+        summary = summary.replace(&issue, &issue.link(opts.issue_link(&issue).unwrap()))
+      }
+    }
+    if let Some(issues) = opts.get_all_pull_requests(&summary) {
+      for issue in issues {
+        summary = summary.replace(&issue, &issue.link(opts.pull_request_link(&issue).unwrap()))
+      }
+    }
+    format!("{}{} ({})", scope, summary, id)
   }
 }
