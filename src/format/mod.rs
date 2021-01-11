@@ -9,6 +9,7 @@ lazy_static! {
 
 pub struct FormatOptions {
   pub show_all: bool,
+  pub emoji: bool,
   pub format_url: Option<FormatURL>,
 }
 
@@ -92,6 +93,14 @@ impl FormatOptions {
       None
     }
   }
+
+  pub fn emoji(&self, emoji: &str) -> String {
+    if self.emoji {
+      emoji.to_string()
+    } else {
+      String::new()
+    }
+  }
 }
 
 impl FormatURL {
@@ -158,6 +167,7 @@ mod test {
     for format_type in vec!["github:issues", "gitlab:issues"] {
       let opts = FormatOptions {
         show_all: true,
+        emoji: true,
         format_url: FormatURL::new(
           "https://github.com/joxit/kokai".to_string(),
           Some(format_type.to_string()),
@@ -203,6 +213,7 @@ mod test {
   fn get_all_pull_requests_gitlab() {
     let opts = FormatOptions {
       show_all: true,
+      emoji: true,
       format_url: FormatURL::new(
         "https://github.com/joxit/kokai".to_string(),
         Some("gitlab:pr".to_string()),
@@ -243,6 +254,7 @@ mod test {
   fn get_all_pull_requests_github() {
     let opts = FormatOptions {
       show_all: true,
+      emoji: true,
       format_url: FormatURL::new(
         "https://github.com/joxit/kokai".to_string(),
         Some("github:pr".to_string()),
@@ -283,6 +295,7 @@ mod test {
   fn issue_pr_links() {
     let github = FormatOptions {
       show_all: true,
+      emoji: true,
       format_url: FormatURL::new(
         "https://github.com/joxit/kokai".to_string(),
         Some("github:issues".to_string()),
@@ -290,6 +303,7 @@ mod test {
     };
     let gitlab = FormatOptions {
       show_all: true,
+      emoji: true,
       format_url: FormatURL::new(
         "https://github.com/joxit/kokai".to_string(),
         Some("gitlab:issues".to_string()),

@@ -27,6 +27,9 @@ pub struct Release {
   /// The git url of the project. Should be a url using http protocol for links.
   #[structopt(long = "git-url")]
   pub git_url: Option<String>,
+  /// Remove emojis from headers.
+  #[structopt(long = "no-emoji")]
+  pub no_emoji: bool,
 }
 
 impl Release {
@@ -59,6 +62,7 @@ impl Release {
       &commits,
       crate::format::FormatOptions {
         show_all: true,
+        emoji: !self.no_emoji,
         format_url: FormatURL::new(git_url, self.add_links.clone()),
       },
     )
