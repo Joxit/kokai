@@ -55,6 +55,7 @@ pub fn print_conventional_commit_release<W: Write>(
     .iter()
     .filter(|c| c.commit_type == CCT::Test)
     .collect();
+  let breaking: Vec<&CC> = commits.iter().filter(|c| c.breaking).collect();
 
   if let Some(date) = date {
     writeln!(w, "{} ({})", tag.h1(), date)?;
@@ -136,6 +137,13 @@ pub fn print_conventional_commit_release<W: Write>(
     let header = opts.emoji(":green_apple: ").add("Chore");
     writeln!(w, "\n{}\n", header.h3())?;
     for c in &chore {
+      writeln!(w, "{}", c.markdown(&opts).list())?;
+    }
+  }
+  if !breaking.is_empty() && opts.show_all {
+    let header = opts.emoji(":warning: ").add("BREAKING CHANGES");
+    writeln!(w, "\n{}\n", header.h3())?;
+    for c in &breaking {
       writeln!(w, "{}", c.markdown(&opts).list())?;
     }
   }

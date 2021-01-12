@@ -2,10 +2,11 @@ use crate::format::formatters::Markdown;
 use crate::format::FormatOptions;
 use crate::git::Commit;
 use regex::Regex;
+use std::ops::Add;
 
 lazy_static! {
   static ref SUMMARY_REGEX: Regex =
-    Regex::new("^(?P<type>fix|feat|perf|revert|build|chore|ci|docs|style|refactor|test)(?:\\((?P<scope>.*)\\))?: (?P<summary>.*)$").unwrap();
+    Regex::new("^(?P<type>fix|feat|perf|revert|build|chore|ci|docs|style|refactor|test)(?:\\((?P<scope>.*)\\))?(?P<breaking>!)?: (?P<summary>.*)$").unwrap();
 }
 
 #[derive(Debug, Clone)]
@@ -14,6 +15,7 @@ pub struct ConventionalCommit {
   pub scope: Option<String>,
   pub summary: String,
   pub commit_type: ConventionalCommitType,
+  pub breaking: bool,
 }
 
 impl std::convert::TryFrom<Commit> for ConventionalCommit {
@@ -31,6 +33,7 @@ impl std::convert::TryFrom<Commit> for ConventionalCommit {
         scope: matches.name("scope").map(|s| s.as_str().to_string()),
         summary: summary.unwrap().as_str().to_string(),
         commit_type: ConventionalCommitType::try_from(commit_type.unwrap().as_str())?,
+        breaking: matches.name("breaking").is_some(),
       })
     } else {
       Err(format!(
