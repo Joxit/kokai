@@ -2,7 +2,6 @@ use crate::format::formatters::Markdown;
 use crate::format::FormatOptions;
 use crate::git::Commit;
 use regex::Regex;
-use std::ops::Add;
 
 lazy_static! {
   static ref SUMMARY_REGEX: Regex =

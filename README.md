@@ -12,7 +12,7 @@ Kokai allows you to create changelog for your releases and full changelog for yo
 ## All kokai commands
 
 ```
-kokai 0.2.0
+kokai 0.3.0
 
 USAGE:
     kokai <SUBCOMMAND>
@@ -22,15 +22,17 @@ FLAGS:
     -V, --version    Prints version information
 
 SUBCOMMANDS:
-    changelog    Create a full changelog of your project
-    help         Prints this message or the help of the given subcommand(s)
-    release      Create a release changelog for a specified tag
+    changelog     Create a full changelog of your project
+    completion    Generate autocompletion file for your shell
+    help          Prints this message or the help of the given subcommand(s)
+    release       Create a release changelog for a specified tag
+
 ```
 
 ### Release
 
 ```
-kokai-release 0.2.0
+kokai-release 0.3.0
 Jones Magloire @Joxit
 Create a release changelog for a specified tag
 
@@ -39,14 +41,19 @@ USAGE:
 
 FLAGS:
     -h, --help            Prints help information
+        --no-emoji        Remove emojis from headers
         --tag-from-ref    Get the tag of the ref commit and use it as a release name. This is like `git describe --tags
                           --exact-match`
     -V, --version         Prints version information
 
 OPTIONS:
-        --name <name>    Explicit name for the release. Useful when tag is a commit or HEAD
-        --ref <ref>      Create a release changelog from previous tag until this ref. Can be a tag, commit hash or
-                         branch
+        --add-links <add-links>    Add links to commits/issues/pr with specified url format (github/gitlab...). For
+                                   commits only using github url format, use github:commits. For gitlab with commits and
+                                   issues use gitlab:commits,issues
+        --git-url <git-url>        The git url of the project. Should be a url using http protocol for links
+        --name <name>              Explicit name for the release. Useful when tag is a commit or HEAD
+        --ref <ref>                Create a release changelog from previous tag until this ref. Can be a tag, commit
+                                   hash or branch
 
 ARGS:
     <repository>    Path to the git repository [default: .]
@@ -55,7 +62,7 @@ ARGS:
 ### Changelog
 
 ```
-kokai-changelog 0.2.0
+kokai-changelog 0.3.0
 Jones Magloire @Joxit
 Create a full changelog of your project
 
