@@ -1,6 +1,6 @@
 [package]
 name = "kokai"
-version = "0.3.0"
+version = "0.3.1"
 authors = ["Jones Magloire @Joxit"]
 description = "Create changelog for your releases and full changelog for your projects using Conventional Commits."
 edition = "2018"

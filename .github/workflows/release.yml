@@ -67,9 +67,3 @@ jobs:
         tags: |
           joxit/kokai:latest
           joxit/kokai:${{steps.current-tag.outputs.tag}}
-    - name: Update repo description
-      uses: peter-evans/dockerhub-description@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-        repository: joxit/kokai

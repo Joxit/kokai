@@ -114,9 +114,9 @@ impl Markdown for ConventionalCommit {
     } else {
       String::new()
     };
-    let small_id = self.id.chars().take(8).collect::<String>().code();
+    let small_id = self.id.chars().take(8).collect::<String>();
     let id = if let Some(commit_url) = &opts.commit_url(&self.id) {
-      small_id.link(commit_url)
+      small_id.code().link(commit_url)
     } else {
       small_id
     };

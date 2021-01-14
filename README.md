@@ -12,7 +12,7 @@ Kokai allows you to create changelog for your releases and full changelog for yo
 ## All kokai commands
 
 ```
-kokai 0.3.0
+kokai 0.3.1
 
 USAGE:
     kokai <SUBCOMMAND>
@@ -32,7 +32,7 @@ SUBCOMMANDS:
 ### Release
 
 ```
-kokai-release 0.3.0
+kokai-release 0.3.1
 Jones Magloire @Joxit
 Create a release changelog for a specified tag
 
@@ -62,7 +62,7 @@ ARGS:
 ### Changelog
 
 ```
-kokai-changelog 0.3.0
+kokai-changelog 0.3.1
 Jones Magloire @Joxit
 Create a full changelog of your project
 
