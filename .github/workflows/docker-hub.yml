@@ -1,0 +1,46 @@
+name: Push on docker hub
+
+on:
+  push:
+    tags: '*'
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Current tag
+      if: github.ref != 'refs/heads/main'
+      id: current-tag
+      run: echo "::set-output name=tag::$(git describe --tags | grep -o '^[0-9]*\.[0-9]*')"
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    - name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Build image latest/tag and push
+      if: github.ref != 'refs/heads/main'
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ./Dockerfile
+        platforms: linux/386,linux/amd64,linux/arm64
+        push: true
+        tags: |
+          joxit/kokai:latest
+          joxit/kokai:${{steps.current-tag.outputs.tag}}
+    - name: Build image main and push
+      if: github.ref == 'refs/heads/main'
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ./Dockerfile
+        platforms: linux/386,linux/amd64,linux/arm64
+        push: true
+        tags: |
+          joxit/kokai:main
